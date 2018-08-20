@@ -1,0 +1,135 @@
+
+
+CREATE TABLE IF NOT EXISTS employee(
+ id serial PRIMARY KEY,
+ first_name VARCHAR(255),
+ last_name  VARCHAR(255)
+ );
+
+ CREATE TABLE IF NOT EXISTS skill_group(
+  id serial PRIMARY KEY,
+  name VARCHAR(255),
+  description  VARCHAR(4000)
+  );
+
+CREATE TABLE IF NOT EXISTS skill_value(
+   name VARCHAR(255),
+   description  VARCHAR(4000),
+   id INT PRIMARY KEY
+   );
+
+CREATE TABLE IF NOT EXISTS skill_description(
+   id serial PRIMARY KEY,
+   name VARCHAR(255),
+   description  VARCHAR(4000),
+   group_id INT, FOREIGN KEY (group_id) REFERENCES skill_group(id)
+ );
+
+
+ CREATE TABLE IF NOT EXISTS employee_skills(
+   id serial PRIMARY KEY,
+   emp_id INT, FOREIGN KEY (emp_id) REFERENCES employee(id),
+   skill_desc_id  INT, FOREIGN KEY (skill_desc_id) REFERENCES skill_description(id),
+   skill_value_id INT, FOREIGN KEY (skill_value_id) REFERENCES skill_value(id)
+ );
+
+  CREATE TABLE IF NOT EXISTS map_excel_skill(
+    id serial PRIMARY KEY,
+    excel_field VARCHAR(255),
+    transit_field VARCHAR(255),
+    excel_group VARCHAR(255),
+    skill INT, FOREIGN KEY (skill) REFERENCES skill_description(id)
+  );
+
+  insert into skill_value (id, name, description)
+  values ('0', 'no knowleage', 'No knowledge or experience');
+  insert into skill_value (id, name, description)
+  values ('1', 'junior', 'Passed training, have surface knowledge, not ready for independent work, need a mentor on the technical part');
+  insert into skill_value (id, name, description)
+  values ('2', 'middle', 'Have experience in the application, ready for independent work as part of the team');
+  insert into skill_value (id, name, description)
+  values ('3', 'senior', 'Have extensive experience. Can work independently, think creatively and act as an expert (teach others)');
+
+CREATE TABLE IF NOT EXISTS xlsx_list(
+id serial primary key,
+xlsx_name varchar(255),
+workSheet_name varchar(255)
+);
+
+CREATE TABLE IF NOT EXISTS table_list(
+id serial primary key,
+name varchar(255),
+created_date date,
+modified_date date,
+xlsx_list_id int, FOREIGN KEY (xlsx_list_id) REFERENCES xlsx_list(id)
+);
+
+
+
+
+CREATE TABLE IF NOT EXISTS validation_type(
+id serial primary key,
+name varchar(255)
+);
+
+CREATE TABLE IF NOT EXISTS validation_list(
+id serial primary key,
+name varchar(255),
+type_id int, FOREIGN KEY (type_id) REFERENCES validation_type(id),
+is_manual boolean
+);
+
+CREATE TABLE IF NOT EXISTS validation_sql_template(
+id serial primary key,
+validation_list_id int, FOREIGN KEY (validation_list_id) REFERENCES validation_list(id),
+sql_text text
+);
+
+CREATE TABLE IF NOT EXISTS validation_param_list(
+id serial primary key,
+name varchar(255),
+type varchar(255),
+validation_list_id int, FOREIGN KEY (validation_list_id) REFERENCES validation_list(id),
+is_multiplate boolean
+);
+
+CREATE TABLE IF NOT EXISTS column_list(
+  id serial PRIMARY KEY,
+  name VARCHAR(255),
+  type VARCHAR(255),
+  size INT,
+  xlsx_skill VARCHAR(255),
+  xlsx_group VARCHAR(255),
+  table_list_id int, FOREIGN KEY (table_list_id) REFERENCES table_list(id),
+  skill_id int, FOREIGN KEY (skill_id) REFERENCES skill_description(id)
+ );
+
+CREATE TABLE IF NOT EXISTS validation(
+id serial primary key,
+table_list_id int, FOREIGN KEY (table_list_id) REFERENCES table_list(id),
+column_list_id int, FOREIGN KEY (column_list_id) REFERENCES column_list(id),
+validation_list_id int, FOREIGN KEY (validation_list_id) REFERENCES validation_list(id)
+);
+
+CREATE TABLE IF NOT EXISTS validation_params(
+id serial primary key,
+value varchar(255),
+validation_id int, FOREIGN KEY (validation_id) REFERENCES validation(id),
+validation_param_list_id int, FOREIGN KEY (validation_param_list_id) REFERENCES validation_param_list(id)
+);
+
+
+insert into validation_type (id, name)
+  values ('0', 'for_column');
+insert into validation_type (id, name)
+  values ('1', 'for_table');
+
+
+
+
+
+
+
+
+
+
